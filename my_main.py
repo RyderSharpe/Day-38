@@ -2,11 +2,23 @@
 import requests
 from datetime import datetime
 import json
+import os
+from dotenv import find_dotenv, load_dotenv
 
-# Google Sheet URL (for reference)
+# Find.env automatically
+dotenv_path = find_dotenv()
+
+# Load the entries as environment variables
+load_dotenv(dotenv_path)
+APPLICATION_ID = os.getenv("APPLICATION_ID")
+APPLICATION_KEY = os.getenv("APPLICATION_KEY")
+BEARER = os.getenv("BEARER")
+ENDPOINT = os.getenv("ENDPOINT")
+
+# Google Sheet URL (for my personal reference)
 google_sheet = "https://docs.google.com/spreadsheets/d/1oDDURgmGxgKfSXErXk2IWqnYTMziTYnhAWsqgcaB4bw/edit?gid=0#gid=0"
 
-# Nutritionix API website URL (for reference)
+# Nutritionix API website URL (for my personal reference)
 website = "https://developer.nutritionix.com/admin/applications/1409625317829"
 print(f"HERE IS WEBSITE-> {website}\n\n")
 
@@ -17,13 +29,13 @@ HEIGHT_CM = "170"
 AGE = "34"
 
 # Nutritionix API credentials
-APPLICATION_ID = "29d2b6c3"
-APPLICATION_KEY = "430667d2ca4195415ec6d6df517baaa4"
+APPLICATION_ID = APPLICATION_ID
+APPLICATION_KEY = APPLICATION_KEY
 HOST_DOMAIN = "https://trackapi.nutritionix.com"
-ENDPOINT = "https://trackapi.nutritionix.com/v2/natural/exercise"
+ENDPOINT = ENDPOINT
 
 # Bearer token for Sheety API authentication
-BEARER = "test123"
+BEARER = BEARER
 
 # Ask user for exercise details
 exercise_text = input("Tell me which exercises you did: ")
@@ -31,7 +43,8 @@ exercise_text = input("Tell me which exercises you did: ")
 # Set headers for Nutritionix API request
 headers = {
     "x-app-id": APPLICATION_ID,
-    "x-app-key": APPLICATION_KEY
+    "x-app-key": APPLICATION_KEY,
+    "Authorization": "Basic cnlkZXI6cGFzcw=="
 }
 
 # Set parameters for Nutritionix API request
@@ -61,9 +74,8 @@ now_time = today.strftime("%H:%M")
 exercises = result['exercises']
 for i in exercises:
     exercise = i['user_input']
-    duration = i['duration_min']
+    duration = int(i['duration_min'])
     calories = i['nf_calories']
-
 
     # Set URL for Sheety API
     url = 'https://api.sheety.co/0e9f1405a7dc8e492b85cdab00bdefc2/copyOfMyWorkouts/workouts'
@@ -79,10 +91,11 @@ for i in exercises:
         }
     }
 
-    # Set headers for Sheety API request (including Bearer token)
+    # Bearer Token Authentication
     bearer_headers = {
         "Authorization": f"Bearer {BEARER}"
     }
+
 
     # Send POST request to Sheety API
     response = requests.post(url, json=body, headers=bearer_headers)
